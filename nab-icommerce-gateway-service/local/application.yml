@@ -1,0 +1,42 @@
+host: localhost
+
+#spring:
+#  zipkin:
+#    base-url: http://${host}:8085/
+
+server:
+  port: 8082
+
+eureka:
+  instance:
+    hostname: ${host}
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:8761/eureka/
+  server:
+    wait-time-in-ms-when-sync-empty: 3000
+
+zuul:
+  host:
+    connect-timeout-millis: 5000000
+    socket-timeout-millis: 5000000
+  ignored-services: '*'
+  routes:
+    system-service:
+      path: /system/**
+      serviceId: system-service
+      stripPrefix: true
+    nab-icommerce-inventory-service:
+      path: /inventory/**
+      serviceId: nab-icommerce-inventory-service
+      stripPrefix: false
+    nab-icommerce-order-service:
+      path: /order/**
+      serviceId: nab-icommerce-order-service
+      stripPrefix: false
+    nab-icommerce-shopping-cart-service:
+      path: /cart/**
+      serviceId: nab-icommerce-shopping-cart-service
+      stripPrefix: false

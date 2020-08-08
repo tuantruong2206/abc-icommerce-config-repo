@@ -1,0 +1,73 @@
+host: localhost
+
+server:
+  port: 8040
+
+eureka:
+  instance:
+    hostname: ${host}
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:8761/eureka/
+  server:
+    wait-time-in-ms-when-sync-empty: 3000
+
+feign:
+  hystrix:
+    enabled: true
+  client:
+    config:
+      default:
+        connectTimeout: 3000
+        readTimeout: 3000
+
+hystrix:
+  command:
+    default:
+      circuitBreaker:
+        sleepWindowInMilliseconds: 30000
+        requestVolumeThreshold: 6
+        #enabled: false
+      execution:
+        isolation:
+          #          strategy: SEMAPHORE, no thread pool but timeout handling stops to work
+          strategy: THREAD
+          thread:
+            timeoutInMilliseconds: 5000
+  metrics:
+    rollingStats:
+      timeInMilliseconds: 60000
+
+  # More info about thread-pool configuration: https://github.com/Netflix/Hystrix/issues/1554
+  threadpool:
+    default:
+      #Number of keep-alive threads (other threads alive for keepAliveTimeMinutes, default 1)
+      coreSize: 10
+
+      # Maximum LinkedBlockingQueue size
+      # -1 for using SynchronousQueue (Default: -1)
+      maxQueueSize: 3
+      # Queue size rejection threshold (Default: 5)
+      queueSizeRejectionThreshold: 3
+
+spring:
+  # To See H2 Console in Browser:
+  # http://localhost:8040/h2-console
+  # Enabling H2 Console
+  h2:
+    console:
+      enabled: true
+  datasource:
+    url: jdbc:h2:file:./data/shopping-cart-service
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
