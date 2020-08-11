@@ -93,24 +93,17 @@ https://github.com/tuantruong2206/abc-icommerce-order-service.git
 > mvn spring-boot:run -Drun.profiles=local -DskipTests
 ```
 
-- service port mapping:
->| Service name  | Port | Service id                          | H2 data dir                  |
->
->|---------------|------|-------------------------------------|------------------------------|
->
->| API gateway   | 8082 | nab-icommerce-api-gw                | NA                           |
->
->| Order         | 8030 | nab-icommerce-order-service         | ./data/order-service         |
->
->| Shopping cart | 8040 | nab-icommerce-shopping-cart-service | ./data/shopping-cart-service |
->
->| Audit         | 8050 | nab-icommerce-audit-service         | ./data/audit-service         |
->
->| Inventory     | 8060 | nab-icommerce-inventory-service     | ./data/inventory-service     |
->
->| config        | 8888 |                                     |                              |
->
->| Discovery     | 8761 |                                     |                              |
+- service port mapping
+
+Service name | Port | Service id | H2 data dir
+---------------|------|-------------------------------------|------------------------------|
+API gateway   | 8082 | nab-icommerce-api-gw                | NA                           |
+Order         | 8030 | nab-icommerce-order-service         | ./data/order-service         |
+Shopping cart | 8040 | nab-icommerce-shopping-cart-service | ./data/shopping-cart-service |
+Audit         | 8050 | nab-icommerce-audit-service         | ./data/audit-service         |
+Inventory     | 8060 | nab-icommerce-inventory-service     | ./data/inventory-service     |
+Config        | 8888 |                                     |                              |
+Discovery     | 8761 |                                     |                              |
 - Data access:
     - After successfully starting services, we can access to its own db by this convention
     ```sh
