@@ -36,7 +36,7 @@
 >
    > Validation check
 >
-   > Many design pattern
+   > Many design pattern like template, DI, 
 > 
    - Should have sometime in future (mentioned in design doc):
 > Should implement Atomic transaction by apply event driven or cloud stream kafka Stream (instead of cloud stream kafka only), compensation transaction in exception case
@@ -94,15 +94,23 @@ https://github.com/tuantruong2206/abc-icommerce-order-service.git
 ```
 
 - service port mapping:
-| Service name  | Port | Service id                          | H2 data dir                  |
-|---------------|------|-------------------------------------|------------------------------|
-| API gateway   | 8082 | nab-icommerce-api-gw                | NA                           |
-| Order         | 8030 | nab-icommerce-order-service         | ./data/order-service         |
-| Shopping cart | 8040 | nab-icommerce-shopping-cart-service | ./data/shopping-cart-service |
-| Audit         | 8050 | nab-icommerce-audit-service         | ./data/audit-service         |
-| Inventory     | 8060 | nab-icommerce-inventory-service     | ./data/inventory-service     |
-| config        | 8888 |                                     |                              |
-| Discovery     | 8761 |                                     |                              |
+>| Service name  | Port | Service id                          | H2 data dir                  |
+>
+>|---------------|------|-------------------------------------|------------------------------|
+>
+>| API gateway   | 8082 | nab-icommerce-api-gw                | NA                           |
+>
+>| Order         | 8030 | nab-icommerce-order-service         | ./data/order-service         |
+>
+>| Shopping cart | 8040 | nab-icommerce-shopping-cart-service | ./data/shopping-cart-service |
+>
+>| Audit         | 8050 | nab-icommerce-audit-service         | ./data/audit-service         |
+>
+>| Inventory     | 8060 | nab-icommerce-inventory-service     | ./data/inventory-service     |
+>
+>| config        | 8888 |                                     |                              |
+>
+>| Discovery     | 8761 |                                     |                              |
 - Data access:
     - After successfully starting services, we can access to its own db by this convention
     ```sh
