@@ -1,9 +1,20 @@
 # abc-icommerce-guideline
 
 # Introduction:
-   - Due to time limitation, I implement a prototype system to demo micro-service pattern to adapt basic requirement from NAB instead of MVP or POC
+   - Due to time limitation, I implement a prototype system to demo micro-service pattern to adapt the basic requirement from NAB instead of MVP or POC
+   - As there is no discussion during development so that I did a lot of assumptions as below:
+        - Have filtered API
+        - Whenever inventory product update, original data will be move to history table and update
+        - Have audit service receive audit sync from kafka message
+        - Customer can log in by social authenticate not implemented by mentioned in design doc
+        - Please follow below scenario to play around with system API
+            - Admin create product by inventory service with these api start with "/inventory/product" (POST/PUT/DELETE/GET)
+            - Then user can create a basket and create some basket details by shopping cart service with API like "/cart/basket" or "/cart/basket-detail", while add basket detail with particular product id and quantity, shopping cart service will call inventory service for checking availability production quantity
+            - Final user and submit basket id to order service for the checkout, while doing checking order service will call shopping cart service to get basket info data then call inventory service for order, Finally call shopping cart service to close the basket
+            NOTE every user will have only one opening basket with status = true, then will be false if user place the order before user can do a new basket. Detail API will be mentioned at the section "API play around".
+                  
    - The source code is implemented base on below tech stack please reference at Tech Stack
-   > Spring cloud framework [AOP, cloud stream kafka, filter etc.]
+   > Spring cloud framework [AOP, cloud stream kafka, request filter etc.]
 >
    > Netflix OSS [Eureka, zuul, hystrix, ribbon]
 >
@@ -28,7 +39,11 @@
    > Many design pattern
 > 
    - Should have sometime in future (mentioned in design doc):
-> Should implement Atomic transaction by apply event driven or cloud stream kafka Stream (instead of cloud stream kafka only)
+> Should implement Atomic transaction by apply event driven or cloud stream kafka Stream (instead of cloud stream kafka only), compensation transaction in exception case
+>
+> Should add swagger for API description
+>
+> Use flyway for database schema versioning
 >   
 > EHcache
 >
@@ -79,14 +94,15 @@ https://github.com/tuantruong2206/abc-icommerce-order-service.git
 ```
 
 - service port mapping:
-    - API gateway: 8082
-    - Order service(./data/order-service, nab-icommerce-order-service): 8030 
-    - Shopping cart service (./data/shopping-cart-service, nab-icommerce-shopping-cart-service): 8040
-    - Audit service (./data/audit-service, nab-icommerce-audit-service): 8050
-    - Inventory service (./data/inventory-service, nab-inventory-service): 8060
-    - Config service: 8888
-    - Discovery service: 8761
-    NOTE: (data-dir in h2, eureka-service-name)
+| Service name  | Port | Service id                          | H2 data dir                  |
+|---------------|------|-------------------------------------|------------------------------|
+| API gateway   | 8082 | nab-icommerce-api-gw                | NA                           |
+| Order         | 8030 | nab-icommerce-order-service         | ./data/order-service         |
+| Shopping cart | 8040 | nab-icommerce-shopping-cart-service | ./data/shopping-cart-service |
+| Audit         | 8050 | nab-icommerce-audit-service         | ./data/audit-service         |
+| Inventory     | 8060 | nab-icommerce-inventory-service     | ./data/inventory-service     |
+| config        | 8888 |                                     |                              |
+| Discovery     | 8761 |                                     |                              |
 - Data access:
     - After successfully starting services, we can access to its own db by this convention
     ```sh
@@ -97,15 +113,10 @@ https://github.com/tuantruong2206/abc-icommerce-order-service.git
     ```
     - you can verify and see above services
 - API play around:
-    - Because there is a limitation of time, the prototype is not completely good enough for exception handling. This project is to demo purpose only. It shows such as microservice, internal service to service communication, kafka event, global exception handling etc.
-    - The context to test API is as below scenario (my ASSUMPTION):
-        - Admin create product by inventory/product api (POST/PUT/DELETE/GET)
-        - Then user can create basket and create basket detail by API, while add basket detail with particular product, shopping cart service will call inventory service for checking avaiability production quantity
-        - Final user and submit basket id to order service for checkout, while doing checking order service will call shopping cart server to get basket info then call inventory service for order, Finally call shopping cart service to close basket
-    - Please strictly follow above scenario to play around with the system. Here below is API detail
-    -  Inventory service: I did data validation on this service
+    - Please strictly follow above scenario to play around with the system. Here below is API detail:
+    -  Inventory service: I did data validation on this service, global exception handling as well as auditing
         - CRUD and data validation check as below:
-            - Create product with error return product name is null
+            - Create a product with error return product name is null
             ```sh
              curl --location --request POST 'http://localhost:8082/inventory/product' \
              --header 'Content-Type: application/json' \
@@ -117,7 +128,7 @@ https://github.com/tuantruong2206/abc-icommerce-order-service.git
                  "quantity": 10
              }'
             ```
-            - Create product successfully
+            - Create a product successfully
             ```sh
           curl --location --request POST 'http://localhost:8082/inventory/product' \
           --header 'Content-Type: application/json' \
@@ -130,7 +141,7 @@ https://github.com/tuantruong2206/abc-icommerce-order-service.git
               "quantity": 100
           }'
             ```
-            - Edit product with error return PLEASE change id follow your data
+            - Edit the product with an error return PLEASE change id follow your data
             ```sh
             curl --location --request PUT 'http://localhost:8082/inventory/product' \
                         --header 'Content-Type: application/json' \
@@ -144,7 +155,7 @@ https://github.com/tuantruong2206/abc-icommerce-order-service.git
                         }'
             ```
             
-            - Edit product PLEASE change id follow your data
+            - Edit the product PLEASE change id follow your data
             ```sh
           curl --location --request PUT 'http://localhost:8082/inventory/product' \
           --header 'Content-Type: application/json' \
@@ -158,13 +169,13 @@ https://github.com/tuantruong2206/abc-icommerce-order-service.git
                   "color": "silver"
           }'
             ```
-            - Delete product PLEASE change id follow your data
+            - Delete the product PLEASE change id follow your data
             ```sh
           curl --location --request DELETE 'localhost:8082/inventory/product/6' \
           --header 'HEADER_USER: Brian.truong'
             ```
-    -  shopping cart service:
-        - We need create basket first by below api
+    -  shopping cart service: This service is created for the demo of interaction between service to service communication by feign client, Should have compensation transaction
+        - We need create a basket first by
             ```sh
           curl --location --request POST 'http://localhost:8082/cart/basket' \
           --header 'Content-Type: application/json' \
@@ -185,7 +196,7 @@ https://github.com/tuantruong2206/abc-icommerce-order-service.git
               "quantity": 1
           }'
           ```
-    - Order service:
+    - Order service: this service is created for the demo of interaction between 3 services by feign clients, Should have compensation transaction 
         - We have basket with detail basket then call order API for checking out, order service will call shopping cart API to get basket info for order. Then call inventory service for order. finally call shopping cart service to close basket
         - Please change userid amd basketId properly       
             ```sh
