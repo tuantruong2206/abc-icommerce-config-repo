@@ -3,14 +3,14 @@
 # Introduction:
    - Due to time limitation, I implement a prototype system to demo micro-service pattern to adapt the basic requirement from NAB instead of MVP or POC
    - As there is no discussion during development so that I did a lot of assumptions as below:
-        - Have filtered API
+        - Have filtered API in inventory service
         - Whenever inventory product update, original data will be move to history table and update
-        - Have audit service receive audit sync from kafka message
+        - Have audit service receive audit which won't impact to user behaviors  sync from kafka message
         - Customer can log in by social authenticate not implemented by mentioned in design doc
-        - Please follow below scenario to play around with system API
-            - Admin create product by inventory service with these api start with "/inventory/product" (POST/PUT/DELETE/GET)
+        - Please follow strictly scenario to play around with system API
+            - Admin create product by inventory service with these APIs start with "/inventory/product" (POST/PUT/DELETE/GET)
             - Then user can create a basket and create some basket details by shopping cart service with API like "/cart/basket" or "/cart/basket-detail", while add basket detail with particular product id and quantity, shopping cart service will call inventory service for checking availability production quantity
-            - Final user and submit basket id to order service for the checkout, while doing checking order service will call shopping cart service to get basket info data then call inventory service for order, Finally call shopping cart service to close the basket
+            - Final user and submit basket id to order service for the checkout, while doing checkout order service will call shopping cart service to get basket info data then call inventory service for order, Finally call shopping cart service to close the basket
             NOTE every user will have only one opening basket with status = true, then will be false if user place the order before user can do a new basket. Detail API will be mentioned at the section "API play around".
                   
    - The source code is implemented base on below tech stack please reference at Tech Stack
@@ -62,19 +62,19 @@
 # Work station setup:
 - Install Kafka: 
 > Download kafka from [here](https://www.apache.org/dyn/closer.cgi?path=/kafka/2.3.1/kafka_2.11-2.3.1.tgz)
-extract kafka
+extract kafka software
 ```sh
 tar -xzf kafka_2.11-x.x.x.tgz
 cd kafka_2.11-x.x.x
 ```
-OSX/Linux
+OSX/Linux: move into extracted kafka dir
 ```sh
 > bin/zookeeper-server-start.sh config/zookeeper.properties
 > bin/kafka-server-start.sh config/server.properties
 ```
 
-- working machine need have JDK 8 and Maven 3.6.0
-Assumption: those software has already installed
+- Working machine need have JDK 8 and Maven 3.6.0
+Assumption: the software has already installed
 - checkout source code from the links below:
 https://github.com/tuantruong2206/abc-icommerce-common-lib.git
 https://github.com/tuantruong2206/abc-icommerce-config-repo.git
@@ -104,7 +104,7 @@ Audit         | 8050 | nab-icommerce-audit-service         | ./data/audit-servic
 Inventory     | 8060 | nab-icommerce-inventory-service     | ./data/inventory-service     |
 Config        | 8888 |                                     |                              |
 Discovery     | 8761 |                                     |                              |
-- Data access:
+-  Access h2 data for each service:
     - After successfully starting services, we can access to its own db by this convention
     ```sh
     http://localhost:<service port>/h2-console
@@ -112,8 +112,8 @@ Discovery     | 8761 |                                     |                    
     password: password
     datadir:jdbc:h2:./data/shopping-cart-service
     ```
-    - you can verify and see above services
-- API play around:
+    - Then you can verify data
+- API played around:
     - Please strictly follow above scenario to play around with the system. Here below is API detail:
     -  Inventory service: I did data validation on this service, global exception handling as well as auditing, there is also have jacoco report at ./target/site/jacoco/index.html if you run mvn clean install
         - CRUD and data validation check as below:
