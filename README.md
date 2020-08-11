@@ -115,7 +115,7 @@ Discovery     | 8761 |                                     |                    
     - you can verify and see above services
 - API play around:
     - Please strictly follow above scenario to play around with the system. Here below is API detail:
-    -  Inventory service: I did data validation on this service, global exception handling as well as auditing
+    -  Inventory service: I did data validation on this service, global exception handling as well as auditing, there is also have jacoco report at ./target/site/jacoco/index.html if you run mvn clean install
         - CRUD and data validation check as below:
             - Create a product with error return product name is null
             ```sh
@@ -175,6 +175,17 @@ Discovery     | 8761 |                                     |                    
           curl --location --request DELETE 'localhost:8082/inventory/product/6' \
           --header 'HEADER_USER: Brian.truong'
             ```
+            - Get the product Please change id follow your data
+            ```sh
+          curl --location --request GET 'localhost:8082/inventory/product/2' \
+          --header 'HEADER_USER: Brian.truong'
+          ```
+            - Filtered data
+            ```sh
+          curl --location --request GET 'localhost:8082/inventory/product/filter-by-criteria?page=0&size=20&sort=id,asc&color=black&name=iphone&startDate=1593582946000&endDate=1598939746000' \
+          --header 'HEADER_USER: Brian.truong'
+          ```
+            - Delete the product PLEASE change id follow your data
     -  shopping cart service: This service is created for the demo of interaction between service to service communication by feign client, Should have compensation transaction
         - We need create a basket first by
             ```sh
