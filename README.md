@@ -41,6 +41,8 @@
    - Should have sometime in future (mentioned in design doc):
 > Should implement Atomic transaction by apply event driven or cloud stream kafka Stream (instead of cloud stream kafka only), compensation transaction in exception case
 >
+> Business convenience, basket should display money amount etc. 
+>
 > Should add swagger for API description
 >
 > Use flyway for database schema versioning
