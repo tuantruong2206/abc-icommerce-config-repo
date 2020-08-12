@@ -6,8 +6,8 @@
         - Have filtered API in inventory service
         - Whenever inventory product update, original data will be move to history table and update
         - Have audit service receive audit which won't impact to user behaviors  sync from kafka message
-        - Customer can log in by social authenticate not implemented by mentioned in design doc
-        - Please follow strictly scenario to play around with system API
+        - Customer can log in by social authenticate not implemented yet, but only mentioned in design doc
+        - Please follow strictly the scenario to play around with system API
             - Admin create product by inventory service with these APIs start with "/inventory/product" (POST/PUT/DELETE/GET)
             - Then user can create a basket and create some basket details by shopping cart service with API like "/cart/basket" or "/cart/basket-detail", while add basket detail with particular product id and quantity, shopping cart service will call inventory service for checking availability production quantity
             - Final user and submit basket id to order service for the checkout, while doing checkout order service will call shopping cart service to get basket info data then call inventory service for order, Finally call shopping cart service to close the basket
