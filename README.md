@@ -1,7 +1,7 @@
 # abc-icommerce-guideline
 
 # Introduction:
-   - Due to time limitation, I implement a prototype system to demo micro-service pattern to adapt the basic requirement from NAB instead of MVP or POC
+   - Due to time limitation, I implement a prototype system to demo micro-service pattern to adapt the basic requirement from ABC instead of MVP or POC
    - As there is no discussion during development so that I did a lot of assumptions as below:
         - Have filtered API in inventory service
         - Whenever inventory product update, original data will be move to history table and update
